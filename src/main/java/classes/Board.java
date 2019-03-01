@@ -1,5 +1,6 @@
 package classes;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,32 +15,44 @@ public class Board {
 	private int tilesInRow;
 	private int boardSize;
 	private int missingPosition;
-	
-	private final static int MAX_TILES_IN_ROW=25;
+
+	public final static int MAX_TILES_IN_ROW = 25;
 
 	// key is value of tile, value- tile
-	Map<Integer, SquareTile> squareTilesValueMap;
+	private Map<Integer, SquareTile> squareTilesValueMap;
 
 	// key is position of tile, value- tile
-	Map<Integer, SquareTile> squareTilesPositionMap;
+	private Map<Integer, SquareTile> squareTilesPositionMap;
 
 	// key is empty position, value is list of neighbors position
-	Map<Integer, List<Integer>> positionsNeighborsMap;
+	private Map<Integer, List<Integer>> positionsNeighborsMap;
 
 	public Board(int tilesInRow) {
 
 		if (tilesInRow < 0) {
-			tilesInRow = Math.abs(tilesInRow);
+			tilesInRow = -(tilesInRow);
+			System.out.println(MessageFormat.format("number of tiles is negative, setting to possitive ({0})", tilesInRow));
 		}
 		
-		tilesInRow=Math.min(tilesInRow, MAX_TILES_IN_ROW);
-
+		if (tilesInRow > MAX_TILES_IN_ROW) {
+			System.out.println(MessageFormat.format("number of tiles is higher than allowed, setting to max ({0})", MAX_TILES_IN_ROW));
+			tilesInRow = MAX_TILES_IN_ROW;
+		}
 		this.tilesInRow = tilesInRow;
 		this.boardSize = (int) Math.pow(tilesInRow, 2);
 		this.squareTilesValueMap = new HashMap<>();
 		this.squareTilesPositionMap = new HashMap<>();
 		this.positionsNeighborsMap = new HashMap<>();
 	}
+	
+	public Board(Board b) { 
+		this.missingPosition=b.missingPosition;
+		this.tilesInRow = b.tilesInRow;
+		this.boardSize = b.boardSize;
+		this.squareTilesValueMap = new HashMap<>(b.squareTilesValueMap);
+		this.squareTilesPositionMap = new HashMap<>(b.squareTilesPositionMap);
+		this.positionsNeighborsMap =new HashMap<>(b.positionsNeighborsMap);
+    } 
 
 	public Map<Integer, SquareTile> getSquareTilesPositionMap() {
 		return squareTilesPositionMap;
@@ -51,6 +64,18 @@ public class Board {
 
 	public int getBoardSize() {
 		return boardSize;
+	}
+	
+	public boolean equals(Board b) {
+		
+		if(this.missingPosition!=b.missingPosition || this.tilesInRow != b.tilesInRow 
+				|| this.boardSize != b.boardSize
+				||!(this.squareTilesValueMap).equals(b.squareTilesValueMap)
+				||!(this.squareTilesPositionMap).equals(b.squareTilesPositionMap)
+				||!(this.positionsNeighborsMap).equals(b.positionsNeighborsMap))
+			return false;
+		
+		return true;
 	}
 
 	public void initBoard(Level level) {
@@ -69,10 +94,10 @@ public class Board {
 	}
 
 	private void mixBoard(Level level) {
-		
-		if(level==null)
-			level=Level.LOW;
-		
+
+		if (level == null)
+			level = Level.LOW;
+
 		Random rand = new Random();
 		int numberOfMoves = level.getNumberOfRandomizedMoves();
 		for (int i = 0; i < numberOfMoves; i++) {
@@ -132,11 +157,11 @@ public class Board {
 				squareTilesPositionMap.put(squareTile.getPosition(), squareTile);
 				missingPosition = position;
 			} else {
-				System.out.println("Tile number: " + tileValueToMove + ", is not a neighbor of the empty place");
+				System.out.println(MessageFormat.format("Tile number: ({0}) is not a neighbor of the empty place",tileValueToMove));
 				validMove = false;
 			}
 		} else {
-			System.out.println("Tile number is not valid");
+			System.out.println(MessageFormat.format("Tile number: ({0}) is not valid",tileValueToMove));
 			validMove = false;
 		}
 
