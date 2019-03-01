@@ -31,11 +31,11 @@ public class Board {
 
 		if (tilesInRow < 0) {
 			tilesInRow = -(tilesInRow);
-			System.out.println(MessageFormat.format("number of tiles is negative, setting to possitive ({0})", tilesInRow));
+			System.out.println(MessageFormat.format("Number of tiles is negative, setting to possitive ({0})", tilesInRow));
 		}
 		
 		if (tilesInRow > MAX_TILES_IN_ROW) {
-			System.out.println(MessageFormat.format("number of tiles is higher than allowed, setting to max ({0})", MAX_TILES_IN_ROW));
+			System.out.println(MessageFormat.format("Number of tiles is higher than allowed, setting to max ({0})", MAX_TILES_IN_ROW));
 			tilesInRow = MAX_TILES_IN_ROW;
 		}
 		this.tilesInRow = tilesInRow;
