@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import enums.Level;
@@ -15,6 +14,8 @@ public class Board {
 	private int tilesInRow;
 	private int boardSize;
 	private int missingPosition;
+	
+	private final static int MAX_TILES_IN_ROW=25;
 
 	// key is value of tile, value- tile
 	Map<Integer, SquareTile> squareTilesValueMap;
@@ -30,11 +31,13 @@ public class Board {
 		if (tilesInRow < 0) {
 			tilesInRow = Math.abs(tilesInRow);
 		}
+		
+		tilesInRow=Math.min(tilesInRow, MAX_TILES_IN_ROW);
 
 		this.tilesInRow = tilesInRow;
 		this.boardSize = (int) Math.pow(tilesInRow, 2);
 		this.squareTilesValueMap = new HashMap<>();
-		this.squareTilesPositionMap = new TreeMap<>();
+		this.squareTilesPositionMap = new HashMap<>();
 		this.positionsNeighborsMap = new HashMap<>();
 	}
 
@@ -66,15 +69,24 @@ public class Board {
 	}
 
 	private void mixBoard(Level level) {
+		
+		if(level==null)
+			level=Level.LOW;
+		
 		Random rand = new Random();
 		int numberOfMoves = level.getNumberOfRandomizedMoves();
 		for (int i = 0; i < numberOfMoves; i++) {
-			List<Integer> possiblePositions = positionsNeighborsMap.get(missingPosition);
-			int randomIndex = possiblePositions.get(rand.nextInt(possiblePositions.size()));
-			SquareTile squareTile = squareTilesPositionMap.get(randomIndex);
-			int tileValueToMove = squareTile.getValue();
-			makeMove(tileValueToMove);
-			// BoardPrinter.printBoard(this);
+
+			if (positionsNeighborsMap.containsKey(missingPosition)) {
+				List<Integer> possiblePositions = positionsNeighborsMap.get(missingPosition);
+				int randomIndex = possiblePositions.get(rand.nextInt(possiblePositions.size()));
+				if (squareTilesPositionMap.containsKey(randomIndex)) {
+					SquareTile squareTile = squareTilesPositionMap.get(randomIndex);
+					int tileValueToMove = squareTile.getValue();
+					makeMove(tileValueToMove);
+					// BoardPrinter.printBoard(this);
+				}
+			}
 		}
 
 	}
@@ -98,7 +110,8 @@ public class Board {
 		positionsToCheck.add(positionUp);
 		positionsToCheck.add(positionDown);
 
-		return positionsToCheck.stream().filter(positionToCheck -> validatePosition(positionToCheck)).collect(Collectors.toList());
+		return positionsToCheck.stream().filter(positionToCheck -> validatePosition(positionToCheck))
+				.collect(Collectors.toList());
 	}
 
 	private boolean validatePosition(Integer positionToCheck) {
